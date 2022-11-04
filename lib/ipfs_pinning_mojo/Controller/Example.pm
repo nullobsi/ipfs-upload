@@ -1,4 +1,4 @@
-package ipfs-pinning-mojo::Controller::Example;
+package ipfs_pinning_mojo::Controller::Example;
 use Mojo::Base 'Mojolicious::Controller', -signatures;
 
 # This action will render a template

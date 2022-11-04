@@ -1,4 +1,4 @@
-package ipfs-pinning-mojo;
+package ipfs_pinning_mojo;
 use Mojo::Base 'Mojolicious', -signatures;
 
 # This method will run once at server start
