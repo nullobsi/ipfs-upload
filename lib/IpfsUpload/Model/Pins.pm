@@ -23,6 +23,12 @@ sub get($self, $where) {
 	});
 }
 
+sub exists($self, $where) {
+	return $self->pg->db->select_p('pins', 'id', $where, {limit => 1})->then(sub ($res) {
+		return $res->rows == 1;
+	});
+}
+
 sub update($self, $update, $where) {
 	return $self->pg->db->update_p('pins', $update, $where, { returning => ['cid', 'id']})->then(sub ($res) {
 		return $res->hash;
