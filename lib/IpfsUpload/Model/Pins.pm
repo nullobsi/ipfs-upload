@@ -8,8 +8,8 @@ use Mojo::Base -base, -signatures;
 has 'pg';
 
 sub add($self, $pin) {
-	return $self->pg->db->insert_p('pins', $pin, {returning => 'id'})->then(sub ($res) {
-		return $res->hash->{id};
+	return $self->pg->db->insert_p('pins', $pin, {returning => ['id', 'created_at']})->then(sub ($res) {
+		return $res->hash;
 	});
 }
 
