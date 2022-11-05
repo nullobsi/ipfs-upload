@@ -67,6 +67,7 @@ sub startup($self) {
 	# Normal route to controller
 	$r->get('/login')->to('Login#login');
 	$r->post('/auth')->to('Login#auth');
+	$r->get('/my')->to('Interface#landing');
 }
 
 1;

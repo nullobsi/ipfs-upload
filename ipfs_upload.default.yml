@@ -12,7 +12,8 @@ ldap:
   dnBase: 'CN=%u,OU=Users,DC=example,DC=org';
 
 ipfs:
-  # Please add leading slash
+  # Please add leading slash for both
   gatewayWriteUrl: "http://localhost:5001/"
+  gatewayPubUrl: "http://localhost:8080/ipfs/"
   delegates:
     - "/ip4/203.0.113.1/tcp/4001/p2p/QmServicePeerId"

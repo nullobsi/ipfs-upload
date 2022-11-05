@@ -1,0 +1,22 @@
+% layout "default";
+% title "Uploads";
+<h1>Uploads</h1>
+<p>
+	Manage your uploads here.
+	<a href="/my/tokens">Click here</a> to manage your access tokens.
+</p>
+
+<ul>
+% for my $pin (@$pins) {
+	<li>
+		<a href="<%= $gateway %><%= $pin->{cid} %>"><%= $pin->{name} || $pin->{cid} %></a>:
+		<a href="/my/delete/<%= $pin->{id} %>">Delete</a>
+	</li>
+% }
+</ul>
+% if (scalar @$pins == 0) {
+	<p>Seems like there's nothing here.</p>
+% } elsif (scalar @$pins == $limit) {
+	<a href="/my?before=<%= $nextPage %>">Next page</a>
+% }
+
