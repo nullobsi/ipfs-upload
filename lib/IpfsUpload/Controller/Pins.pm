@@ -40,6 +40,68 @@ sub list($c) {
 	});
 }
 
+sub delete($c) {
+	$c->openapi->valid_input or return;
+	my $uid = $c->stash('uid');
+	my $id = $c->param('requestid');
+
+	my $pin = $c->pins->get({
+		id => $id,
+	})->then(sub ($pin) {
+		if (!defined $pin) {
+			return $c->render(status => 404, openapi => {
+				error => {
+					reason  => "NOT_FOUND",
+					details => "The specified resource was not found",
+				},
+			});
+		}
+		if ($pin->{uid} ne $uid) {
+			return $c->render(status => 401, openapi => {
+				error => {
+					reason => "UNAUTHORIZED",
+					details => "You cannot delete that pin.",
+				},
+			});
+		}
+
+		# I wonder if this could cause a race condition.
+		# Who cares!
+		my $cid = $pin->{cid};
+		say $cid;
+
+		return $c->pins->cid_count($cid)->then(sub ($count) {
+			if ($count == 1) {
+				my $url = Mojo::URL->new($c->config->{ipfs}->{gatewayWriteUrl});
+				$url->path("api/v0/pin/rm");
+				$url->query({
+					arg       => $cid,
+					recursive => "true",
+				});
+
+				return $c->ua->post_p($url);
+			}
+
+			return 1;
+		})->then(sub ($tx) {
+			if ($tx != 1) {
+				my $res = $tx->result;
+				if (!$res->is_success) {
+					die "Could not delete pin!";
+				}
+			}
+
+			return $c->pins->del({
+				id  => $id,
+			});
+		})->then(sub {
+			$c->render(status => 202, openapi => "");
+		});
+	})
+
+
+}
+
 sub add($c) {
 	$c->openapi->valid_input or return;
 	my $uid = $c->stash('uid');
