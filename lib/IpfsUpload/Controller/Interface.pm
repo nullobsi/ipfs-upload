@@ -41,4 +41,16 @@ sub landing($c) {
 	})
 }
 
+sub token_list($c) {
+	my $uid = $c->session->{uid};
+	if (!defined $uid) {
+		return $c->redirect_to("/login");
+	}
+
+	return $c->users->list_tokens($uid)->then(sub ($tokens) {
+		$c->stash(tokens => $tokens);
+		$c->render('interface/tokens');
+	})
+}
+
 1;

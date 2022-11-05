@@ -1,0 +1,25 @@
+% layout "default";
+% title "Uploads";
+<h1>Tokens</h1>
+<p>Here you can delete or generate tokens.</p>
+
+<table>
+	<tr>
+		<th>Token ID</th>
+		<th>App Name</th>
+		<th>Actions</th>
+	</tr>
+% for my $token (@$tokens) {
+	<tr>
+		<td><%= $token->{id} %></td>
+		<td><%= $token->{app_name} %></td>
+		<td>
+			<a href="/my/tokens/<%= $token->{id} %>/delete">Delete</a>
+		</td>
+	</tr>
+% }
+</table>
+
+<a href="/my/tokens/generate">
+	Generate Token
+</a>
