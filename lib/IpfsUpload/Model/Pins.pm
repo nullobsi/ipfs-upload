@@ -23,6 +23,12 @@ sub get($self, $where) {
 	});
 }
 
+sub update($self, $update, $where) {
+	return $self->pg->db->update_p('pins', $update, $where, { returning => ['cid', 'id']})->then(sub ($res) {
+		return $res->hash;
+	});
+}
+
 sub cid_count($self, $cid) {
 	return $self->pg->db->select_p('pins', 'cid', {cid => $cid})->then(sub ($res) {
 		return $res->rows;

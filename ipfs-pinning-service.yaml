@@ -476,6 +476,7 @@ components:
         requestid:
           description: Globally unique identifier of the pin request; can be used to check the status of ongoing pinning, or pin removal
           type: string
+          format: uuid
           example: "UniqueIdOfPinRequest"
         status:
           $ref: '#/components/schemas/Status'
