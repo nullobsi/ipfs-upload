@@ -40,12 +40,53 @@ sub list($c) {
 	});
 }
 
+sub get($c) {
+	$c->openapi->valid_input or return;
+	my $uid = $c->stash('uid');
+	my $id = $c->param('requestid');
+
+	return $c->pins->get({
+		id => $id,
+	})->then(sub ($pin) {
+		if (!defined $pin) {
+			return $c->render(status => 404, openapi => {
+				error => {
+					reason  => "NOT_FOUND",
+					details => "The specified resource was not found",
+				},
+			})
+		}
+
+		# TODO: Should any pin be accessible to the public?
+		if ($pin->{uid} ne $uid) {
+			return $c->render(status => 401, openapi => {
+				error => {
+					reason => "UNAUTHORIZED",
+					details => "You cannot view that pin.",
+				},
+			});
+		}
+
+		return $c->render(status => 200, openapi => {
+			requestid => $pin->{id},
+			# TODO
+			status    => "pinned",
+			created   => IpfsUpload::Util::date_format($pin->{created_at}),
+			pin       => {
+				cid  => $pin->{cid},
+				name => $pin->{name},
+			},
+			delegates => $c->config->{ipfs}->{delegates},
+		});
+	});
+}
+
 sub delete($c) {
 	$c->openapi->valid_input or return;
 	my $uid = $c->stash('uid');
 	my $id = $c->param('requestid');
 
-	my $pin = $c->pins->get({
+	return $c->pins->get({
 		id => $id,
 	})->then(sub ($pin) {
 		if (!defined $pin) {
@@ -97,9 +138,7 @@ sub delete($c) {
 		})->then(sub {
 			$c->render(status => 202, openapi => "");
 		});
-	})
-
-
+	});
 }
 
 sub add($c) {
