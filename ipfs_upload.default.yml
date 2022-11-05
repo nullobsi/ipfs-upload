@@ -1,0 +1,12 @@
+---
+secrets:
+  - HERE
+
+database:
+  type: 'postgres'
+  connection: 'postgresql://'
+
+ipfs:
+  gatewayWriteUrl: "http://localhost:5001/"
+  delegates:
+    - "/ip4/203.0.113.1/tcp/4001/p2p/QmServicePeerId"

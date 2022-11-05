@@ -275,7 +275,7 @@ Pin objects can be listed by executing `GET /pins` with optional parameters:
 "
 
 servers:
-  - url: https://pinning-service.example.com
+  - url: "/api/"
 
 tags:
   - name: pins
@@ -283,6 +283,7 @@ tags:
 paths:
   /pins:
     get:
+      x-mojo-to: "Pins#list"
       operationId: getPins
       summary: List pin objects
       description: List all the pin objects, matching optional filters; when no filter is provided, only successful pins are returned
@@ -317,6 +318,7 @@ paths:
         '5XX':
           $ref: '#/components/responses/InternalServerError'
     post:
+      x-mojo-to: "Pins#add"
       operationId: addPin
       summary: Add pin object
       description: Add a new pin object for the current access token
@@ -356,6 +358,7 @@ paths:
         schema:
           type: string
     get:
+      x-mojo-to: "Pins#get"
       operationId: getPinByRequestId
       summary: Get pin object
       description: Get a pin object and its status
@@ -381,6 +384,7 @@ paths:
         '5XX':
           $ref: '#/components/responses/InternalServerError'
     post:
+      x-mojo-to: "Pins#replace"
       operationId: replacePinByRequestId
       summary: Replace pin object
       description: Replace an existing pin object (shortcut for executing remove and add operations in one step to avoid unnecessary garbage collection of blocks present in both recursive pins)
@@ -412,6 +416,7 @@ paths:
         '5XX':
           $ref: '#/components/responses/InternalServerError'
     delete:
+      x-mojo-to: "Pins#delete"
       operationId: deletePinByRequestId
       summary: Remove pin object
       description: Remove a pin object

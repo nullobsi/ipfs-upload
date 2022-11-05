@@ -1,0 +1,32 @@
+create table users
+(
+    uid      uuid default gen_random_uuid()   not null
+        constraint users_pk primary key,
+    username varchar(64) not null
+);
+
+
+create table pins
+(
+    id         uuid default gen_random_uuid() not null
+        constraint pins_pk
+            primary key,
+    created_at date default now()             not null,
+    cid        varchar(128)                   not null,
+    name       varchar(512),
+    uid        uuid                           not null
+        constraint pins_uid_users_uid_fk
+            references users (uid)
+);
+
+
+create table access_token
+(
+    uid   uuid         not null
+        constraint access_token_users_null_fk
+            references users (uid),
+    token varchar(512) not null
+        constraint access_token_pk
+            primary key
+);
+
