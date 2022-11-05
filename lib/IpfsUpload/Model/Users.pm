@@ -7,14 +7,24 @@ use Mojo::Base -base, -signatures;
 
 has 'pg';
 
-sub id_from_token($self, $token) {
-	my $res = $self->pg->db->select('access_token', ['uid'], { token => $token })->hash;
+sub token_info($self, $token) {
+	return $self->pg->db->select('access_token', ['uid', 'app_name'], { token => $token })->hash;
+}
 
-	if (!defined $res) {
-		return undef;
-	}
+sub token_info_p($self, $token) {
+	return $self->pg->db->select_p('access_token', ['uid', 'app_name', 'id'], {
+		token => $token,
+	})->then(sub ($res) {
+		return $res->hash;
+	});
+}
 
-	return $res->{uid};
+sub list_tokens($self, $uid) {
+	return $self->pg->db->select_p('access_token', ['uid', 'app_name', 'id'], {
+		uid => $uid,
+	})->then(sub ($res) {
+		return $res->hashes;
+	});
 }
 
 sub getOrMake($self, $username) {

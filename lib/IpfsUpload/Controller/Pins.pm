@@ -6,6 +6,7 @@ use experimental q/signatures/;
 use Mojo::Base 'Mojolicious::Controller', -signatures;
 use IpfsUpload::Util;
 use Mojo::UserAgent;
+use Mojo::JSON qw(decode_json encode_json);
 
 sub list($c) {
 	$c->openapi->valid_input or return;
@@ -29,6 +30,24 @@ sub list($c) {
 
 	my $limit = $c->param('limit') || 10;
 
+	# Only app_name is supported.
+	my $meta = $c->param('meta');
+	my $app_name;
+
+	if (defined $meta) {
+		eval {
+			$meta = decode_json $meta;
+			$app_name = $meta->{app_name};
+		};
+
+		return $c->render(status => 400, openapi =>{
+			error => {
+				reason  => "INVALID_PARAM",
+				details => "Parameter 'meta' is invalid.",
+			},
+		}) if $@;
+	}
+
 	# Not supporting meta.
 
 	if (defined $cid) {
@@ -47,6 +66,9 @@ sub list($c) {
 			$query{created_at} = { '>' => $after };
 		}
 	}
+	if (defined $app_name) {
+		$query{app_name} = $app_name;
+	}
 
 	$c->pins->list(\%query, $limit)->then(sub ($res) {
 
@@ -63,6 +85,7 @@ sub list($c) {
 					name => $v->{name},
 				},
 				delegates => $c->config->{ipfs}->{delegates},
+				meta      => { app_name => $v->{app_name}},
 			};
 		}
 
@@ -111,6 +134,7 @@ sub get($c) {
 				name => $pin->{name},
 			},
 			delegates => $c->config->{ipfs}->{delegates},
+			meta      => { app_name => $pin->{app_name}},
 		});
 	});
 }
@@ -118,6 +142,7 @@ sub get($c) {
 sub replace($c) {
 	$c->openapi->valid_input or return;
 	my $uid = $c->stash('uid');
+	my $app_name = $c->stash('app_name');
 	my $id = $c->param('requestid');
 
 	my $body = $c->req->json;
@@ -206,8 +231,9 @@ sub replace($c) {
 			if ($res->is_success) {
 				# Now we do DB stuff.
 				return $c->pins->update({
-					cid  => $cid,
-					name => $name,
+					cid      => $cid,
+					name     => $name,
+					app_name => $app_name,
 				}, {
 					id => $id,
 				});
@@ -256,6 +282,7 @@ sub replace($c) {
 					name => $name,
 				},
 				delegates => $c->config->{ipfs}->{delegates},
+				meta      => { app_name => $app_name},
 			}, status => 202);
 		});
 	});
@@ -324,6 +351,7 @@ sub delete($c) {
 sub add($c) {
 	$c->openapi->valid_input or return;
 	my $uid = $c->stash('uid');
+	my $app_name = $c->stash('app_name');
 
 	my $body = $c->req->json;
 
@@ -403,9 +431,10 @@ sub add($c) {
 			if ($res->is_success) {
 				# Now we do DB stuff.
 				return $c->pins->add({
-					uid  => $uid,
-					cid  => $cid,
-					name => $name,
+					uid      => $uid,
+					cid      => $cid,
+					name     => $name,
+					app_name => $app_name,
 				});
 			} else {
 				# TODO: read error and use appropriate response
@@ -423,6 +452,7 @@ sub add($c) {
 					name => $name,
 				},
 				delegates => $c->config->{ipfs}->{delegates},
+				meta      => { app_name => $app_name},
 			}, status => 202)
 		});
 	});
