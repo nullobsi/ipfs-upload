@@ -12,9 +12,43 @@ sub list($c) {
 
 	my $uid = $c->stash('uid');
 
-	$c->pins->list({
+	my %query = (
 		uid => $uid,
-	}, 10)->then(sub ($res) {
+	);
+
+	my $cid = $c->param('cid');
+	my $name = $c->param('name');
+	# TODO: Text matching strategy
+	my $match = $c->param('match');
+
+	# TODO: filter by status (only pinned)
+	my $status = $c->param('status');
+
+	my $before = $c->param('before');
+	my $after = $c->param('after');
+
+	my $limit = $c->param('limit') || 10;
+
+	# Not supporting meta.
+
+	if (defined $cid) {
+		$query{cid} = $cid;
+	}
+	if (defined $name) {
+		$query{name} = $name;
+	}
+	if (defined $before) {
+		$query{created_at} = { '<' => $before };
+	}
+	if (defined $after) {
+		if (defined $query{created_at}) {
+			$query{created_at}->{'>'} = $after;
+		} else {
+			$query{created_at} = { '>' => $after };
+		}
+	}
+
+	$c->pins->list(\%query, $limit)->then(sub ($res) {
 
 		my @formatted;
 
