@@ -22,12 +22,20 @@ sub startup($self) {
 					my $auth = $c->req->headers->authorization;
 					if (defined $auth) {
 						$auth =~ s/Bearer //;
-						my $uid = $c->users->id($auth);
+						my $uid = $c->users->id_from_token($auth);
 						if (defined $uid) {
 							$c->stash(uid => $uid);
 							return $c->$cb();
 						}
 					}
+
+					# Try session auth
+					my $uid = $c->session->{uid};
+					if (defined $uid) {
+						$c->stash(uid => $uid);
+						return $c->$cb();
+					}
+
 					return $c->$cb('Authorization header not present');
 				},
 			},
@@ -57,7 +65,8 @@ sub startup($self) {
 	my $r = $self->routes;
 
 	# Normal route to controller
-	$r->get('/')->to('Example#welcome');
+	$r->get('/login')->to('Login#login');
+	$r->post('/auth')->to('Login#auth');
 }
 
 1;

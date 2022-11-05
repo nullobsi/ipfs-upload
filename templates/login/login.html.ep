@@ -1,0 +1,15 @@
+% layout "default";
+% title "Login";
+<h1>Login</h1>
+%= form_for auth => (method => 'POST') => begin
+	<p>
+		%= label_for username => 'Username'
+		%= text_field 'username', id=>'username'
+	</p>
+	<p>
+		%= label_for password => 'Password'
+		%= password_field 'password', id=>'password'
+	</p>
+    %= submit_button
+% end
+
