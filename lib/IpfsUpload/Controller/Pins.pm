@@ -294,21 +294,14 @@ sub delete($c) {
 	my $id = $c->param('requestid');
 
 	return $c->pins->get({
-		id => $id,
+		id  => $id,
+		uid => $uid,
 	})->then(sub ($pin) {
 		if (!defined $pin) {
 			return $c->render(status => 404, openapi => {
 				error => {
 					reason  => "NOT_FOUND",
 					details => "The specified resource was not found",
-				},
-			});
-		}
-		if ($pin->{uid} ne $uid) {
-			return $c->render(status => 401, openapi => {
-				error => {
-					reason => "UNAUTHORIZED",
-					details => "You cannot delete that pin.",
 				},
 			});
 		}

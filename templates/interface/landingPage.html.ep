@@ -6,11 +6,20 @@
 	<a href="/my/tokens">Click here</a> to manage your access tokens.
 </p>
 
+% if (my $msg = flash 'msg') {
+	<p>
+		<b>
+			%= $msg
+		</b>
+	</p>
+% }
+
 <ul>
 % for my $pin (@$pins) {
 	<li>
 		<a href="<%= $gateway %><%= $pin->{cid} %>"><%= $pin->{name} || $pin->{cid} %></a>:
-		<a href="/my/delete/<%= $pin->{id} %>">Delete</a>
+		<a href="/my/pins/<%= $pin->{id} %>/delete">Delete</a>
+		<small>Created by: <%= $pin->{app_name} %></small>
 	</li>
 % }
 </ul>

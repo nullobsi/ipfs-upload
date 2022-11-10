@@ -94,4 +94,56 @@ sub del_token($c) {
 	});
 }
 
+sub del_pin($c) {
+	my $uid = $c->session->{uid};
+	my $id = $c->param('id');
+	if (!defined $uid) {
+		return $c->redirect_to("/login");
+	}
+
+	return $c->pins->get({
+		id  => $id,
+		uid => $uid,
+	})->then(sub ($pin) {
+		if (!defined $pin) {
+			$c->flash(msg => "That pin doesn't exist.");
+			return $c->redirect_to('/my/tokens');
+		}
+
+		# I wonder if this could cause a race condition.
+		# Who cares!
+		my $cid = $pin->{cid};
+		say $cid;
+
+		return $c->pins->cid_count($cid)->then(sub ($count) {
+			if ($count == 1) {
+				my $url = Mojo::URL->new($c->config->{ipfs}->{gatewayWriteUrl});
+				$url->path("api/v0/pin/rm");
+				$url->query({
+					arg       => $cid,
+					recursive => "true",
+				});
+
+				return $c->ua->post_p($url);
+			}
+
+			return 1;
+		})->then(sub ($tx) {
+			if ($tx != 1) {
+				my $res = $tx->result;
+				if (!$res->is_success) {
+					die "Could not delete pin!";
+				}
+			}
+
+			return $c->pins->del({
+				id  => $id,
+			});
+		})->then(sub {
+			$c->flash(msg => "Pin deleted.");
+			return $c->redirect_to('/my');
+		});
+	});
+}
+
 1;
