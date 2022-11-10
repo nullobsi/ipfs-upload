@@ -1,32 +1,38 @@
-create table users
-(
-    uid      uuid default gen_random_uuid()   not null
-        constraint users_pk primary key,
-    username varchar(64) not null
+CREATE TABLE access_token (
+    uid uuid NOT NULL,
+    token character varying(512) NOT NULL,
+    app_name character varying(128),
+    id uuid DEFAULT gen_random_uuid() NOT NULL
 );
 
-
-create table pins
-(
-    id         uuid default gen_random_uuid() not null
-        constraint pins_pk
-            primary key,
-    created_at date default now()             not null,
-    cid        varchar(128)                   not null,
-    name       varchar(512),
-    uid        uuid                           not null
-        constraint pins_uid_users_uid_fk
-            references users (uid)
+CREATE TABLE pins (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    cid character varying(128) NOT NULL,
+    name character varying(512),
+    uid uuid NOT NULL,
+    app_name character varying(128)
 );
 
-
-create table access_token
-(
-    uid   uuid         not null
-        constraint access_token_users_null_fk
-            references users (uid),
-    token varchar(512) not null
-        constraint access_token_pk
-            primary key
+CREATE TABLE users (
+    uid uuid DEFAULT gen_random_uuid() NOT NULL,
+    username character varying(64) NOT NULL
 );
 
+ALTER TABLE ONLY access_token
+    ADD CONSTRAINT access_token_pk PRIMARY KEY (id);
+
+ALTER TABLE ONLY pins
+    ADD CONSTRAINT pins_pk PRIMARY KEY (id);
+
+ALTER TABLE ONLY users
+    ADD CONSTRAINT users_pk PRIMARY KEY (uid);
+
+CREATE UNIQUE INDEX access_token_token_uindex ON access_token USING btree (token);
+
+CREATE UNIQUE INDEX pins_cid_uid_uindex ON pins USING btree (cid, uid);
+
+CREATE UNIQUE INDEX users_username_uindex ON users USING btree (username);
+
+ALTER TABLE ONLY access_token
+    ADD CONSTRAINT access_token_users_uid_fk FOREIGN KEY (uid) REFERENCES users(uid);
