@@ -9,7 +9,7 @@ database:
 # Use ldap auth
 ldap:
   uri: 'ldaps://127.0.0.1'
-  dnBase: 'CN=%u,OU=Users,DC=example,DC=org';
+  dnBase: 'CN=%u,OU=Users,DC=example,DC=org'
 
 ipfs:
   # Please add leading slash for both
