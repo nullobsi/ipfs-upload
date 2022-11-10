@@ -65,6 +65,8 @@ sub startup($self) {
 
 	$r->get('/')->to('Interface#upload_get');
 	$r->post('/')->to('Interface#upload_post');
+
+	$r->post('/my/import')->to('Interface#import_post');
 }
 
 1;

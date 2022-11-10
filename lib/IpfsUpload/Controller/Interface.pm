@@ -230,4 +230,77 @@ sub upload_get ($c) {
 	return $c->render('interface/uploadPage');
 }
 
+sub import_post ($c) {
+	if (!IpfsUpload::Util::check_auth($c)) {
+		return $c->redirect_to("/login");
+	}
+	my $uid = $c->stash('uid');
+	my $app_name = $c->stash('app_name');
+
+	my $v = $c->validation;
+	return $c->render('/') unless $v->has_data;
+
+	$v->required('cid', 'trim')->size(1,128);
+	$v->optional('name', 'trim')->size(1,512);
+	$v->optional('is_browser');
+	return $c->render('/') if $v->has_error;
+
+	my $cid = $v->param('cid');
+	my $name = $v->param('name');
+	my $is_browser = $v->param('is_browser');
+
+	my $pub_url = Mojo::URL->new($c->config->{ipfs}->{gatewayPubUrl});
+	$pub_url->path($cid);
+	$pub_url = $pub_url->to_string;
+
+	return $c->pins->exists({
+		cid => $cid,
+		uid => $uid,
+	})->then(sub ($exists){
+		if ($exists == 1) {
+			if ($is_browser) {
+				$c->flash(msg => "Pin already exists: $pub_url");
+				return $c->redirect_to('/my');
+			} else {
+				return $c->render(text => $pub_url);
+			}
+		}
+
+		my $url = Mojo::URL->new($c->config->{ipfs}->{gatewayWriteUrl});
+		$url->path("api/v0/pin/add");
+		$url->query({
+			arg       => $cid,
+			recursive => "true",
+			# It seems progress is a stream. Not sure how to handle that?
+			# Let's just assume it works immediately.
+			# TODO.
+			progress  => "false",
+		});
+
+		return $c->ua->post_p($url)->then(sub($tx) {
+			my $res = $tx->result;
+
+			if ($res->is_success) {
+				# Now we do DB stuff.
+				return $c->pins->add({
+					uid      => $uid,
+					cid      => $cid,
+					name     => $name,
+					app_name => $app_name,
+				});
+			} else {
+				# TODO: read error and use appropriate response
+				say $res->body;
+				die "Failed to pin.";
+			}
+		})->then(sub($res) {
+			if ($is_browser) {
+				$c->flash(msg => "Pin added: $pub_url");
+				return $c->redirect_to('/my');
+			} else {
+				return $c->render(text => $pub_url);
+			}
+		});
+	});
+}
 1;

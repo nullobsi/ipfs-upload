@@ -20,3 +20,20 @@
 	%= submit_button 'Upload!'
 	<input hidden type="text" name="is_browser" value="Yes">
 % end
+
+<p>
+Alternatively, import an existing CID:
+</p>
+
+%= form_for '/my/import' => (method => 'POST') => begin
+	<p>
+		%= label_for cid => 'CID:'
+		%= text_field 'cid', id => 'cid'
+	</p>
+	<p>
+		%= label_for name => 'Filename:'
+		%= text_field 'name', id => 'name'
+	</p>
+	%= submit_button 'Upload!'
+	<input hidden type="text" name="is_browser" value="Yes">
+% end
