@@ -4,12 +4,14 @@ use warnings FATAL => 'all';
 use experimental q/signatures/;
 
 use Mojo::Base 'Mojolicious::Controller', -signatures;
+use IpfsUpload::Util;
 
 sub landing($c) {
-	my $uid = $c->session->{uid};
-	if (!defined $uid) {
+	if (!IpfsUpload::Util::check_auth($c)) {
 		return $c->redirect_to("/login");
 	}
+
+	my $uid = $c->stash('uid');
 
 	my $gateway = $c->config->{ipfs}->{gatewayPubUrl};
 
@@ -42,6 +44,7 @@ sub landing($c) {
 }
 
 sub token_list($c) {
+	# Token should only be managed through Session auth
 	my $uid = $c->session->{uid};
 	if (!defined $uid) {
 		return $c->redirect_to("/login");
@@ -54,6 +57,7 @@ sub token_list($c) {
 }
 
 sub gen_token_post($c) {
+	# Token should only be managed through Session auth
 	my $uid = $c->session->{uid};
 	if (!defined $uid) {
 		return $c->redirect_to("/login");
@@ -74,6 +78,7 @@ sub gen_token_post($c) {
 }
 
 sub gen_token_get($c) {
+	# Token should only be managed through Session auth
 	my $uid = $c->session->{uid};
 	if (!defined $uid) {
 		return $c->redirect_to("/login");
@@ -83,6 +88,7 @@ sub gen_token_get($c) {
 }
 
 sub del_token($c) {
+	# Token should only be managed through Session auth
 	my $uid = $c->session->{uid};
 	if (!defined $uid) {
 		return $c->redirect_to("/login");
@@ -95,11 +101,11 @@ sub del_token($c) {
 }
 
 sub del_pin($c) {
-	my $uid = $c->session->{uid};
-	my $id = $c->param('id');
-	if (!defined $uid) {
+	if (!IpfsUpload::Util::check_auth($c)) {
 		return $c->redirect_to("/login");
 	}
+	my $uid = $c->stash('uid');
+	my $id = $c->param('id');
 
 	return $c->pins->get({
 		id  => $id,
@@ -144,6 +150,84 @@ sub del_pin($c) {
 			return $c->redirect_to('/my');
 		});
 	});
+}
+
+sub upload_post($c) {
+	if (!IpfsUpload::Util::check_auth($c)) {
+		return $c->redirect_to("/login");
+	}
+	my $uid = $c->stash('uid');
+	my $app_name = $c->stash('app_name');
+
+	my $file = $c->req->upload('file');
+	my $filename = $file->filename;
+
+	my $is_browser = $c->param('is_browser');
+
+	# Ten megabytes
+	my $max_size = 10 * 1024 * 1024;
+
+	unless ($file) {
+		$c->flash(msg => "No file specified.");
+		return $c->redirect_to('/my');
+	}
+
+	if ($file->size > $max_size) {
+		$c->flash(msg => "Max file size reached. (10MB)");
+		return $c->redirect_to('/my');
+	}
+
+	# TODO: streaming somehow
+	my $file_content = $file->slurp;
+
+	my $ua = $c->ua;
+	my $url = Mojo::URL->new($c->config->{ipfs}->{gatewayWriteUrl});
+
+	my $pub_url = Mojo::URL->new($c->config->{ipfs}->{gatewayPubUrl});
+
+	$url->path("api/v0/add");
+	$url->query(
+		progress => "false",
+		pin      => "true",
+	);
+	return $ua->post_p($url => form => {
+		file => {
+			content        => $file_content,
+			filename       => $filename,
+			'Content-Type' => $file->headers->content_type,
+		},
+	})->then(sub ($tx) {
+		my $res = $tx->result;
+
+		if ($res->is_success) {
+			# Now we do DB stuff.
+			return $c->pins->add({
+				cid      => $res->json->{Hash},
+				name     => $filename,
+				app_name => $app_name,
+				uid      => $uid,
+			});
+		} else {
+			# TODO: read error and use appropriate response
+			say $res->body;
+			die "Failed to pin.";
+		}
+	})->then(sub ($res) {
+		$pub_url->path($res->{cid});
+		my $s = $pub_url->to_string;
+		if ($is_browser) {
+			$c->flash(msg => "File uploaded! $s");
+			return $c->redirect_to("/my");
+		}
+		return $c->render(text => $s);
+	});
+}
+
+sub upload_get ($c) {
+	if (!IpfsUpload::Util::check_auth($c)) {
+		return $c->redirect_to("/login");
+	}
+	return $c->render('interface/uploadPage');
 }
 
 1;

@@ -4,6 +4,7 @@ use warnings FATAL => 'all';
 use experimental q/signatures/;
 
 use Mojo::Base 'Mojolicious::Controller', -signatures;
+use IpfsUpload::Util;
 use Net::LDAPS;
 
 sub auth($c) {
@@ -38,9 +39,8 @@ sub auth($c) {
 }
 
 sub login($c) {
-	my $uid = $c->session->{uid};
-	if (defined $uid) {
-		return $c->redirect_to('my');
+	if (IpfsUpload::Util::check_auth($c)) {
+		return $c->redirect_to("/my");
 	}
 	return $c->render();
 }

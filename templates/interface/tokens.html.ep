@@ -11,22 +11,28 @@
 </p>
 % }
 
-<table>
-	<tr>
-		<th>Token ID</th>
-		<th>App Name</th>
-		<th>Actions</th>
-	</tr>
-% for my $token (@$tokens) {
-	<tr>
-		<td><%= $token->{id} %></td>
-		<td><%= $token->{app_name} %></td>
-		<td>
-			<a href="/my/tokens/<%= $token->{id} %>/delete">Delete</a>
-		</td>
-	</tr>
-% }
+
+
+% if (scalar @$tokens == 0) {
+	<p>Seems like there's nothing here.</p>
+% } else {
+	<table>
+		<tr>
+			<th>Token ID</th>
+			<th>App Name</th>
+			<th>Actions</th>
+		</tr>
+		% for my $token (@$tokens) {
+			<tr>
+				<td><%= $token->{id} %></td>
+				<td><%= $token->{app_name} %></td>
+				<td>
+					<a href="/my/tokens/<%= $token->{id} %>/delete">Delete</a>
+				</td>
+			</tr>
+		% }
 </table>
+% }
 
 <a href="/my/tokens/generate">
 	Generate Token

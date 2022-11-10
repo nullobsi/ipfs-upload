@@ -7,6 +7,7 @@ use Mojo::Base 'Mojolicious', -signatures;
 use Mojo::Pg;
 use IpfsUpload::Model::Users;
 use IpfsUpload::Model::Pins;
+use IpfsUpload::Util;
 
 # This method will run once at server start
 sub startup($self) {
@@ -19,30 +20,11 @@ sub startup($self) {
 			url      => $self->home->rel_file("ipfs-pinning-service.yaml"),
 			security => {
 				accessToken => sub($c, $def, $scopes, $cb) {
-					my $auth = $c->req->headers->authorization;
-					if (defined $auth) {
-						$auth =~ s/Bearer //;
-						my $tinfo = $c->users->token_info($auth);
-						if (defined $tinfo) {
-							$c->stash(
-								uid => $tinfo->{uid},
-								app_name => $tinfo->{app_name}
-							);
-							return $c->$cb();
-						}
-					}
-
-					# Try session auth
-					my $uid = $c->session->{uid};
-					if (defined $uid) {
-						$c->stash(
-							uid      => $uid,
-							app_name => 'WebInterface',
-						);
+					if (IpfsUpload::Util::check_auth($c)) {
 						return $c->$cb();
+					} else {
+						return $c->$cb('Authorization header not present');
 					}
-
-					return $c->$cb('Authorization header not present');
 				},
 			},
 		},
@@ -80,6 +62,9 @@ sub startup($self) {
 	$r->post('/my/tokens/generate')->to('Interface#gen_token_post');
 	$r->get('/my/tokens/#id/delete')->to('Interface#del_token');
 	$r->get('/my/pins/#id/delete')->to('Interface#del_pin');
+
+	$r->get('/')->to('Interface#upload_get');
+	$r->post('/')->to('Interface#upload_post');
 }
 
 1;
