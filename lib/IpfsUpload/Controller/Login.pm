@@ -8,9 +8,12 @@ use Net::LDAPS;
 
 sub auth($c) {
 	my $v = $c->validation;
+	return $c->render('login/login') unless $v->has_data;
 
 	$v->required('username', 'trim')->size(1,32)->like(qr/^([a-z_][a-z0-9_-]*[\$]?)$/);
 	$v->required('password');
+	return $c->render('login/login') if $v->has_error;
+
 
 	my $username = $c->param('username');
 	my $password = $c->param('password');
@@ -31,11 +34,6 @@ sub auth($c) {
 		$c->session->{uid} = $res;
 		$c->flash(message => "Logged in.");
 		$c->redirect_to('/my');
-	});
-
-	$c->render(openapi => {
-		count   => 0,
-		results => [],
 	});
 }
 

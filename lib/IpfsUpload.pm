@@ -75,6 +75,9 @@ sub startup($self) {
 	$r->post('/auth')->to('Login#auth');
 	$r->get('/my')->to('Interface#landing');
 	$r->get('/my/tokens')->to('Interface#token_list');
+
+	$r->get('/my/tokens/generate')->to('Interface#gen_token_get');
+	$r->post('/my/tokens/generate')->to('Interface#gen_token_post');
 }
 
 1;

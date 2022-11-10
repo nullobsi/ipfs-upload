@@ -1,0 +1,12 @@
+% layout "default";
+% title "Uploads";
+<h1>New Token</h1>
+
+%= form_for '/my/tokens/generate' => (method => 'POST') => begin
+	<p>
+		%= label_for app_name => 'App name:'
+		%= text_field 'app_name', id => 'app_name'
+	</p>
+	%= submit_button
+% end
+

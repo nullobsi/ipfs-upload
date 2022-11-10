@@ -53,4 +53,33 @@ sub token_list($c) {
 	})
 }
 
+sub gen_token_post($c) {
+	my $uid = $c->session->{uid};
+	if (!defined $uid) {
+		return $c->redirect_to("/login");
+	}
+
+	my $v = $c->validation;
+	return $c->render('interface/generateToken') unless $v->has_data;
+
+	$v->required('app_name', 'trim')->size(1,64);
+	return $c->render('interface/generateToken') if $v->has_error;
+
+	my $app_name = $v->param('app_name');
+
+	return $c->users->gen_token($uid, $app_name)->then(sub ($res) {
+		$c->flash(msg => "Your new token is: $res");
+		return $c->redirect_to('/my/tokens');
+	});
+}
+
+sub gen_token_get($c) {
+	my $uid = $c->session->{uid};
+	if (!defined $uid) {
+		return $c->redirect_to("/login");
+	}
+
+	return $c->render('interface/generateToken');
+}
+
 1;

@@ -9,7 +9,8 @@ WriteMakefile(
       'Mojolicious'                  => '9.27',
       'Mojolicious::Plugin::OpenAPI' => '5.07',
       'Mojo::Pg'                     => '4.27',
-      'DateTime::Format::Pg'         => '0.16001'
+      'DateTime::Format::Pg'         => '0.16001',
+      'Crypt::Random'                => '1.25',
   },
   test => {TESTS => 't/*.t'}
 );

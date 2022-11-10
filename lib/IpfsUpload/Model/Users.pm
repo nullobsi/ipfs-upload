@@ -2,6 +2,7 @@ package IpfsUpload::Model::Users;
 use strict;
 use warnings FATAL => 'all';
 use experimental q/signatures/;
+use Crypt::Random qw( makerandom_octet );
 
 use Mojo::Base -base, -signatures;
 
@@ -16,6 +17,25 @@ sub token_info_p($self, $token) {
 		token => $token,
 	})->then(sub ($res) {
 		return $res->hash;
+	});
+}
+
+sub gen_token($self, $uid, $app_name) {
+	my $size = 512;
+	my $r = makerandom_octet(Size => $size, Strength => 0);
+	my $s = unpack "H*",     pack "B*", '0' x ( $size%8 ? 8-$size % 8 : 0 ).
+		unpack "b$size", $r;
+
+	return $self->pg->db->insert_p(
+		'access_token',
+		{
+			uid      => $uid,
+			app_name => $app_name,
+			token    => $s,
+		},
+		{returning => ['token']}
+	)->then(sub ($res) {
+		return $res->hash->{token};
 	});
 }
 
@@ -37,5 +57,6 @@ sub getOrMake($self, $username) {
 		});
 	});
 }
+
 
 1;
