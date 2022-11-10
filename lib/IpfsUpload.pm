@@ -78,6 +78,7 @@ sub startup($self) {
 
 	$r->get('/my/tokens/generate')->to('Interface#gen_token_get');
 	$r->post('/my/tokens/generate')->to('Interface#gen_token_post');
+	$r->get('/my/tokens/#id/delete')->to('Interface#del_token');
 }
 
 1;

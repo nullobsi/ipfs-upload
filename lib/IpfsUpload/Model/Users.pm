@@ -39,6 +39,16 @@ sub gen_token($self, $uid, $app_name) {
 	});
 }
 
+sub del_token($self, $uid, $id) {
+	return $self->pg->db->delete_p(
+		'access_token',
+		{
+			uid => $uid,
+			id  => $id,
+		}
+	);
+}
+
 sub list_tokens($self, $uid) {
 	return $self->pg->db->select_p('access_token', ['uid', 'app_name', 'id'], {
 		uid => $uid,
@@ -57,6 +67,5 @@ sub getOrMake($self, $username) {
 		});
 	});
 }
-
 
 1;

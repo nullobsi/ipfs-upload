@@ -82,4 +82,16 @@ sub gen_token_get($c) {
 	return $c->render('interface/generateToken');
 }
 
+sub del_token($c) {
+	my $uid = $c->session->{uid};
+	if (!defined $uid) {
+		return $c->redirect_to("/login");
+	}
+
+	return $c->users->del_token($uid, $c->param('id'))->then(sub {
+		$c->flash(msg => 'Token deleted.');
+		return $c->redirect_to('/my/tokens')
+	});
+}
+
 1;
