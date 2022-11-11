@@ -8,6 +8,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    overflow-wrap: break-word;
 }
 
 h1, h2 {
@@ -89,6 +90,11 @@ footer a:link, footer a:visited, header a:link, header a:visited {
 
 footer a:hover, header a:hover {
     text-decoration: underline;
+}
+
+span.copyleft {
+    display: inline-block;
+    transform: rotate(180deg);
 }
 
 /* Form */
