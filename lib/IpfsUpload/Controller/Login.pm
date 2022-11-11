@@ -45,4 +45,9 @@ sub login($c) {
 	return $c->render();
 }
 
+sub logout($c) {
+	delete $c->session->{uid};
+	return $c->redirect_to('/login');
+}
+
 1;

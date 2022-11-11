@@ -49,6 +49,7 @@ sub token_list($c) {
 	if (!defined $uid) {
 		return $c->redirect_to("/login");
 	}
+	$c->stash(uid => $c->session->{uid});
 
 	return $c->users->list_tokens($uid)->then(sub ($tokens) {
 		$c->stash(tokens => $tokens);
@@ -62,6 +63,7 @@ sub gen_token_post($c) {
 	if (!defined $uid) {
 		return $c->redirect_to("/login");
 	}
+	$c->stash(uid => $c->session->{uid});
 
 	my $v = $c->validation;
 	return $c->render('interface/generateToken') unless $v->has_data;
@@ -83,6 +85,7 @@ sub gen_token_get($c) {
 	if (!defined $uid) {
 		return $c->redirect_to("/login");
 	}
+	$c->stash(uid => $c->session->{uid});
 
 	return $c->render('interface/generateToken');
 }
@@ -93,6 +96,7 @@ sub del_token($c) {
 	if (!defined $uid) {
 		return $c->redirect_to("/login");
 	}
+	$c->stash(uid => $c->session->{uid});
 
 	return $c->users->del_token($uid, $c->param('id'))->then(sub {
 		$c->flash(msg => 'Token deleted.');
@@ -303,4 +307,5 @@ sub import_post ($c) {
 		});
 	});
 }
+
 1;

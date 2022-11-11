@@ -54,6 +54,7 @@ sub startup($self) {
 
 	# Normal route to controller
 	$r->get('/login')->to('Login#login');
+	$r->get('/my/logout')->to('Login#logout');
 	$r->post('/auth')->to('Login#auth');
 	$r->get('/my')->to('Interface#landing');
 	$r->get('/my/tokens')->to('Interface#token_list');

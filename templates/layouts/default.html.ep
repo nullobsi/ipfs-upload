@@ -1,5 +1,35 @@
 <!DOCTYPE html>
 <html>
-  <head><title><%= title %></title></head>
-  <body><%= content %></body>
+  <head>
+    <meta charset="UTF-8">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/main.css">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+  </head>
+  <body>
+  <header>
+    <div id="header-content">
+      <h1>IPFS Upload</h1>
+      <nav>
+        % if (!defined stash('uid')) {
+          <a href="/login">Login</a>
+        % } else {
+          <a href="/my">My Pins</a>
+          <a href="/">Upload</a>
+        % }
+      </nav>
+    </div>
+  </header>
+  <main>
+    <%= content %>
+  </main>
+  <footer>
+    <span class="copyleft">&copy;</span> Licensed under AGPL: <a href="https://git.unix.dog/nullobsi/ipfs-upload">Source Code</a>
+    <br>
+    % if (defined stash('uid')) {
+      <a href="/my/logout">Log out</a>
+    % }
+  </footer>
+  </body>
 </html>
