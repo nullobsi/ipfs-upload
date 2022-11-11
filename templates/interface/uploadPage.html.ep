@@ -37,3 +37,12 @@ Alternatively, import an existing CID:
 	%= submit_button 'Upload!'
 	<input hidden type="text" name="is_browser" value="Yes">
 % end
+
+<p>
+You can also do uploads from the CLI. Add an access token and do the following:
+</p>
+
+<pre>
+$ curl -H "Authorization: Bearer ..." -F file=@/my/file <%= url_for->to_abs %>
+<%= config->{ipfs}->{gatewayPubUrl} %>Qm...
+</pre>

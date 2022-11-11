@@ -11,8 +11,6 @@
 </p>
 % }
 
-
-
 % if (scalar @$tokens == 0) {
 	<p>Seems like there's nothing here.</p>
 % } else {
@@ -37,3 +35,13 @@
 <a href="/my/tokens/generate">
 	Generate Token
 </a>
+
+<p>
+	To use this pinning service with your local IPFS node, point
+	your IPFS node at the endpoint <b><%= url_for('/api')->to_abs %></b>
+	and give it the generated access token.
+	<br>
+</p>
+<p>
+	<a href="https://docs.ipfs.tech/how-to/work-with-pinning-services/">More info on pinning</a>
+</p>
