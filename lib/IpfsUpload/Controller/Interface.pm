@@ -123,7 +123,6 @@ sub del_pin($c) {
 		# I wonder if this could cause a race condition.
 		# Who cares!
 		my $cid = $pin->{cid};
-		say $cid;
 
 		return $c->pins->cid_count($cid)->then(sub ($count) {
 			if ($count == 1) {
@@ -213,7 +212,7 @@ sub upload_post($c) {
 			});
 		} else {
 			# TODO: read error and use appropriate response
-			say $res->body;
+			warn $res->body;
 			die "Failed to pin.";
 		}
 	})->then(sub ($res) {
@@ -294,7 +293,7 @@ sub import_post ($c) {
 				});
 			} else {
 				# TODO: read error and use appropriate response
-				say $res->body;
+				warn $res->body;
 				die "Failed to pin.";
 			}
 		})->then(sub($res) {

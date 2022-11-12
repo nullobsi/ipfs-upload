@@ -105,7 +105,8 @@ sub get($c) {
 	my $id = $c->param('requestid');
 
 	return $c->pins->get({
-		id => $id,
+		uid => $uid,
+		id  => $id,
 	})->then(sub ($pin) {
 		if (!defined $pin) {
 			return $c->render(status => 404, openapi => {
@@ -114,16 +115,6 @@ sub get($c) {
 					details => "The specified resource was not found",
 				},
 			})
-		}
-
-		# TODO: Should any pin be accessible to the public?
-		if ($pin->{uid} ne $uid) {
-			return $c->render(status => 401, openapi => {
-				error => {
-					reason => "UNAUTHORIZED",
-					details => "You cannot view that pin.",
-				},
-			});
 		}
 
 		return $c->render(status => 200, openapi => {
@@ -241,7 +232,7 @@ sub replace($c) {
 				});
 			} else {
 				# TODO: read error and use appropriate response
-				say $res->body;
+				warn $res->body;
 				die "Failed to pin.";
 			}
 		})->then(sub($res) {
@@ -253,7 +244,6 @@ sub replace($c) {
 			return $c->pins->cid_count($pin->{cid});
 		})->then(sub($count) {
 			# Zero this time, since we already replaced the DB entry.
-			say "Count: $count";
 			if ($count == 0) {
 				my $url = Mojo::URL->new($c->config->{ipfs}->{gatewayWriteUrl});
 				$url->path("api/v0/pin/rm");
@@ -311,7 +301,6 @@ sub delete($c) {
 		# I wonder if this could cause a race condition.
 		# Who cares!
 		my $cid = $pin->{cid};
-		say $cid;
 
 		return $c->pins->cid_count($cid)->then(sub ($count) {
 			if ($count == 1) {
@@ -433,7 +422,7 @@ sub add($c) {
 				});
 			} else {
 				# TODO: read error and use appropriate response
-				say $res->body;
+				warn $res->body;
 				die "Failed to pin.";
 			}
 		})->then(sub($res) {
