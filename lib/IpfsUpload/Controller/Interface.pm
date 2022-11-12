@@ -27,10 +27,19 @@ sub landing($c) {
 	}
 
 	$c->pins->list(\%query, $limit)->then(sub ($res) {
+		for my $pin (@$res) {
+			my $url = Mojo::URL->new($gateway);
+			$url->path($pin->{cid});
+			if ($pin->{name}) {
+				$url->query(
+					filename => $pin->{name},
+				);
+			}
+			$pin->{publicUrl} = $url;
+		}
 		$c->stash(
 			pins    => $res,
 			limit   => $limit,
-			gateway => $gateway,
 		);
 
 		if (@$res == $limit) {
@@ -217,6 +226,9 @@ sub upload_post($c) {
 		}
 	})->then(sub ($res) {
 		$pub_url->path($res->{cid});
+		$pub_url->query(
+			filename => $res->{name},
+		) if $res->{name};
 		my $s = $pub_url->to_string;
 		if ($is_browser) {
 			$c->flash(msg => "File uploaded! $s");
@@ -254,6 +266,9 @@ sub import_post ($c) {
 
 	my $pub_url = Mojo::URL->new($c->config->{ipfs}->{gatewayPubUrl});
 	$pub_url->path($cid);
+	$pub_url->query(
+		filename => $name,
+	) if $name;
 	$pub_url = $pub_url->to_string;
 
 	return $c->pins->exists({

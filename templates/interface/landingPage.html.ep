@@ -3,7 +3,8 @@
 <h1>Uploads</h1>
 <p>
 	Manage your uploads here.
-	<a href="/my/tokens">Click here</a> to manage your access tokens.
+	<a href="/my/tokens">Click here</a> to manage your access tokens,
+	or <a href="/">here</a> to upload via this website.
 </p>
 
 % if (my $msg = flash 'msg') {
@@ -17,7 +18,7 @@
 <ul>
 % for my $pin (@$pins) {
 	<li>
-		<a href="<%= $gateway %><%= $pin->{cid} %>"><%= $pin->{name} || $pin->{cid} %></a>:
+		<a href="<%= $pin->{publicUrl} %>"><%= $pin->{name} || $pin->{cid} %></a>:
 		<a href="/my/pins/<%= $pin->{id} %>/delete">Delete</a>
 		<small>Created by: <%= $pin->{app_name} %></small>
 	</li>
