@@ -33,8 +33,11 @@ sub auth($c) {
 		return $c->users->getOrMake($username);
 	})->then(sub ($res) {
 		$c->session->{uid} = $res;
-		$c->flash(message => "Logged in.");
+		$c->flash(msg => "Logged in.");
 		$c->redirect_to('/my');
+	})->catch(sub ($err) {
+		$c->flash(msg => "Login failed.");
+		$c->redirect_to('/login');
 	});
 }
 

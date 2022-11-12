@@ -1,6 +1,15 @@
 % layout "default";
 % title "Login";
 <h1>Login</h1>
+
+% if (my $msg = flash 'msg') {
+<p>
+	<b>
+		%= $msg
+	</b>
+</p>
+% }
+
 %= form_for auth => (method => 'POST') => begin
 	<p>
 		%= label_for username => 'Username'
