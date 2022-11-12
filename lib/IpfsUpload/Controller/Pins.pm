@@ -70,29 +70,31 @@ sub list($c) {
 		$query{app_name} = $app_name;
 	}
 
-	$c->pins->list(\%query, $limit)->then(sub ($res) {
+	$c->pins->count(\%query)->then(sub ($count) {
+		$c->pins->list(\%query, $limit)->then(sub ($res) {
 
-		my @formatted;
+			my @formatted;
 
-		for my $v (@$res) {
-			push @formatted, {
-				requestid => $v->{id},
-				# TODO
-				status    => "pinned",
-				created   => IpfsUpload::Util::date_format($v->{created_at}),
-				pin       => {
-					cid  => $v->{cid},
-					name => $v->{name},
-				},
-				delegates => $c->config->{ipfs}->{delegates},
-				meta      => { app_name => $v->{app_name}},
-			};
-		}
+			for my $v (@$res) {
+				push @formatted, {
+					requestid => $v->{id},
+					# TODO
+					status    => "pinned",
+					created   => IpfsUpload::Util::date_format($v->{created_at}),
+					pin       => {
+						cid  => $v->{cid},
+						name => $v->{name},
+					},
+					delegates => $c->config->{ipfs}->{delegates},
+					meta      => { app_name => $v->{app_name}},
+				};
+			}
 
 
-		$c->render(openapi => {
-			count   => scalar(@formatted),
-			results => \@formatted,
+			$c->render(openapi => {
+				count   => $count,
+				results => \@formatted,
+			});
 		});
 	});
 }

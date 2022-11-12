@@ -36,9 +36,13 @@ sub update($self, $update, $where) {
 }
 
 sub cid_count($self, $cid) {
-	return $self->pg->db->select_p('pins', 'cid', {cid => $cid})->then(sub ($res) {
-		return $res->rows;
-	})
+	return count({cid => $cid});
+}
+
+sub count($self, $where) {
+	return $self->pg->db->select_p('pins', 'count(*)', $where)->then(sub ($res) {
+		return $res->hash->{count};
+	});
 }
 
 sub list($self, $where, $limit) {
