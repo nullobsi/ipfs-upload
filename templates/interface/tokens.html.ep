@@ -38,7 +38,7 @@
 
 <p>
 	To use this pinning service with your local IPFS node, point
-	your IPFS node at the endpoint <b><%= url_for('/api')->to_abs %></b>
+	your IPFS node at the endpoint <b><%= url_for('/api')->to_abs->scheme("https") %></b>
 	and give it the generated access token.
 	<br>
 </p>
