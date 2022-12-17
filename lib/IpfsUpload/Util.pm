@@ -65,14 +65,17 @@ sub update_query($c, $query) {
 			$app_name = $meta->{app_name};
 		};
 
-		$c->render(status => 400, openapi =>{
-			error => {
-				reason  => "INVALID_PARAM",
-				details => "Parameter 'meta' is invalid.",
-			},
-		}) if $@;
+		if ($@) {
+			$c->render(status => 400, openapi =>{
+				error => {
+					reason  => "INVALID_PARAM",
+					details => "Parameter 'meta' is invalid.",
+				},
+			});
 
-		return 0;
+			return 0;
+		}
+
 	}
 
 	# Not supporting meta.
