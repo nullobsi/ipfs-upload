@@ -15,6 +15,7 @@
         % if (!defined stash('uid')) {
           <a href="/login">Login</a>
         % } else {
+          <a href="/my/tokens">Access Tokens</a>
           <a href="/my">My Pins</a>
           <a href="/">Upload</a>
         % }
