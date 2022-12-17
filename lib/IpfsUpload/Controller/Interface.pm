@@ -126,7 +126,7 @@ sub del_pin($c) {
 	})->then(sub ($pin) {
 		if (!defined $pin) {
 			$c->flash(msg => "That pin doesn't exist.");
-			return $c->redirect_to('/my/tokens');
+			return $c->redirect_to('/my');
 		}
 
 		# I wonder if this could cause a race condition.
@@ -159,6 +159,9 @@ sub del_pin($c) {
 			});
 		})->then(sub {
 			$c->flash(msg => "Pin deleted.");
+			return $c->redirect_to('/my');
+		}, sub {
+			$c->flash(msg => "Error: " . $_);
 			return $c->redirect_to('/my');
 		});
 	});

@@ -36,7 +36,7 @@ sub update($self, $update, $where) {
 }
 
 sub cid_count($self, $cid) {
-	return count({cid => $cid});
+	return $self->count({cid => $cid});
 }
 
 sub count($self, $where) {
