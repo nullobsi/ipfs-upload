@@ -16,40 +16,44 @@ sub landing($c) {
 	my $gateway = $c->config->{ipfs}->{gatewayPubUrl};
 
 	my $limit = $c->param('limit') || 10;
-	my $before = $c->param('before');
-
 	my %query = (
 		uid => $uid,
 	);
 
-	if (defined $before) {
-		$query{created_at} = { '<' => $before };
+	if (!IpfsUpload::Util::update_query($c, \%query)) {
+		# Error!
+		return;
 	}
 
-	$c->pins->list(\%query, $limit)->then(sub ($res) {
-		for my $pin (@$res) {
-			my $url = Mojo::URL->new($gateway);
-			$url->path($pin->{cid});
-			if ($pin->{name}) {
-				$url->query(
-					filename => $pin->{name},
-				);
-			}
-			$pin->{publicUrl} = $url;
-		}
+	$c->pins->count(\%query)->then(sub ($count) {
 		$c->stash(
-			pins    => $res,
-			limit   => $limit,
+			count => $count
 		);
+		$c->pins->list(\%query, $limit)->then(sub($res) {
+			for my $pin (@$res) {
+				my $url = Mojo::URL->new($gateway);
+				$url->path($pin->{cid});
+				if ($pin->{name}) {
+					$url->query(
+						filename => $pin->{name},
+					);
+				}
+				$pin->{publicUrl} = $url;
+			}
+			$c->stash(
+				pins  => $res,
+				limit => $limit,
+			);
 
-		if (@$res == $limit) {
-			$c->stash(nextPage => $res->[-1]->{created_at});
-		} else {
-			$c->stash(nextPage => 0);
-		}
+			if (@$res == $limit) {
+				$c->stash(nextPage => $res->[-1]->{created_at});
+			} else {
+				$c->stash(nextPage => 0);
+			}
 
-		$c->render('interface/landingPage');
-	})
+			$c->render('interface/landingPage');
+		})
+	});
 }
 
 sub token_list($c) {

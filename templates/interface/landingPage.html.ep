@@ -15,6 +15,10 @@
 	</p>
 % }
 
+<p>
+	<%= $count %> pins found.
+</p>
+
 <ul>
 % for my $pin (@$pins) {
 	<li>
@@ -27,6 +31,6 @@
 % if (scalar @$pins == 0) {
 	<p>Seems like there's nothing here.</p>
 % } elsif (scalar @$pins == $limit) {
-	<a href="/my?before=<%= $nextPage %>">Next page</a>
+	<a href="<%= url_with->query({before => $nextPage}) %>">Next page</a>
 % }
 

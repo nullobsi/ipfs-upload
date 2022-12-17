@@ -13,61 +13,14 @@ sub list($c) {
 
 	my $uid = $c->stash('uid');
 
+	my $limit = $c->param('limit') || 10;
 	my %query = (
 		uid => $uid,
 	);
 
-	my $cid = $c->param('cid');
-	my $name = $c->param('name');
-	# TODO: Text matching strategy
-	my $match = $c->param('match');
-
-	# TODO: filter by status (only pinned)
-	my $status = $c->param('status');
-
-	my $before = $c->param('before');
-	my $after = $c->param('after');
-
-	my $limit = $c->param('limit') || 10;
-
-	# Only app_name is supported.
-	my $meta = $c->param('meta');
-	my $app_name;
-
-	if (defined $meta) {
-		eval {
-			$meta = decode_json $meta;
-			$app_name = $meta->{app_name};
-		};
-
-		return $c->render(status => 400, openapi =>{
-			error => {
-				reason  => "INVALID_PARAM",
-				details => "Parameter 'meta' is invalid.",
-			},
-		}) if $@;
-	}
-
-	# Not supporting meta.
-
-	if (defined $cid) {
-		$query{cid} = $cid;
-	}
-	if (defined $name) {
-		$query{name} = $name;
-	}
-	if (defined $before) {
-		$query{created_at} = { '<' => $before };
-	}
-	if (defined $after) {
-		if (defined $query{created_at}) {
-			$query{created_at}->{'>'} = $after;
-		} else {
-			$query{created_at} = { '>' => $after };
-		}
-	}
-	if (defined $app_name) {
-		$query{app_name} = $app_name;
+	if (!IpfsUpload::Util::update_query($c, \%query)) {
+		# Error!
+		return;
 	}
 
 	$c->pins->count(\%query)->then(sub ($count) {
