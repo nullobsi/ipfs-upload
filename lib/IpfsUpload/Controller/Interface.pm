@@ -172,6 +172,11 @@ sub del_pin($c) {
 }
 
 sub upload_post($c) {
+	# Immediate check for size limit
+	if ($c->req->is_limit_exceeded) {
+		return $c->render(text => "Max file size reached.", status => 413);
+	}
+
 	if (!IpfsUpload::Util::check_auth($c)) {
 		return $c->redirect_to("/login");
 	}
@@ -191,9 +196,13 @@ sub upload_post($c) {
 		return $c->redirect_to('/my');
 	}
 
-	if ($c->req->is_limit_exceeded || $file->size > $max_size) {
-		$c->flash(msg => "Max file size reached.");
-		return $c->redirect_to('/my');
+	if ($file->size > $max_size) {
+		if ($is_browser) {
+			$c->flash(msg => "Max file size reached.");
+			return $c->redirect_to('/my');
+		} else {
+			return $c->render(text => "Max file size reached.", status => 413);
+		}
 	}
 
 	# TODO: streaming somehow
