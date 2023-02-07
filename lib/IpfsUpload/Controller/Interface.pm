@@ -188,8 +188,8 @@ sub upload_post($c) {
 
 	my $is_browser = $c->param('is_browser');
 
-	# Ten megabytes
-	my $max_size = 10 * 1024 * 1024;
+	# Hundred megabytes
+	my $max_size = 100 * 1024 * 1024;
 
 	unless ($file) {
 		$c->flash(msg => "No file specified.");

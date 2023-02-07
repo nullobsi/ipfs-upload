@@ -2,6 +2,8 @@
 secrets:
   - HERE
 
+max_upload_size: 104857600
+
 database:
   type: 'postgres'
   connection: 'postgresql://'

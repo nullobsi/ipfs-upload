@@ -48,6 +48,7 @@ sub startup($self) {
 
 	# Configure the application
 	$self->secrets($config->{secrets});
+	$self->max_request_size($config->{max_upload_size});
 
 	# Router
 	my $r = $self->routes;
