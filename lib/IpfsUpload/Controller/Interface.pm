@@ -191,8 +191,8 @@ sub upload_post($c) {
 		return $c->redirect_to('/my');
 	}
 
-	if ($file->size > $max_size || $c->req->is_limit_exceeded) {
-		$c->flash(msg => "Max file size reached. (10MB)");
+	if ($c->req->is_limit_exceeded || $file->size > $max_size) {
+		$c->flash(msg => "Max file size reached.");
 		return $c->redirect_to('/my');
 	}
 
