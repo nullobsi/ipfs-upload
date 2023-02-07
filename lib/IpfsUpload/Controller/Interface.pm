@@ -220,7 +220,7 @@ sub upload_post($c) {
 	);
 	return $ua->post_p($url => form => {
 		file => {
-			content        => $file_asset,
+			file           => $file_asset,
 			filename       => $filename,
 			'Content-Type' => $file->headers->content_type,
 		},
