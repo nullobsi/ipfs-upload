@@ -197,7 +197,7 @@ sub upload_post($c) {
 	}
 
 	# TODO: streaming somehow
-	my $file_content = $file->slurp;
+	my $file_asset = $file->asset;
 
 	my $ua = $c->ua;
 	my $url = Mojo::URL->new($c->config->{ipfs}->{gatewayWriteUrl});
@@ -211,7 +211,7 @@ sub upload_post($c) {
 	);
 	return $ua->post_p($url => form => {
 		file => {
-			content        => $file_content,
+			content        => $file_asset,
 			filename       => $filename,
 			'Content-Type' => $file->headers->content_type,
 		},
