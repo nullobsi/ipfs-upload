@@ -178,7 +178,7 @@ sub upload_post($c) {
 	my $uid = $c->stash('uid');
 	my $app_name = $c->stash('app_name');
 
-	my $file = $c->req->upload('file');
+	my $file = $c->param('file');
 	my $filename = $file->filename;
 
 	my $is_browser = $c->param('is_browser');
@@ -191,7 +191,7 @@ sub upload_post($c) {
 		return $c->redirect_to('/my');
 	}
 
-	if ($file->size > $max_size) {
+	if ($file->size > $max_size || $c->req->is_limit_exceeded) {
 		$c->flash(msg => "Max file size reached. (10MB)");
 		return $c->redirect_to('/my');
 	}
