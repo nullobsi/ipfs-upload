@@ -10,6 +10,7 @@ WriteMakefile(
       'Mojolicious::Plugin::OpenAPI' => '5.07',
       'Mojo::Pg'                     => '4.27',
       'Crypt::Random'                => '1.25',
+      'Number::Bytes::Human'         => '0.11',
   },
   test => {TESTS => 't/*.t'}
 );
