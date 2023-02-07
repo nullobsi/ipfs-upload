@@ -2,7 +2,10 @@
 % title "Uploads";
 % use Number::Bytes::Human qw/format_bytes/;
 <h1>Upload</h1>
-<p>Here you can upload files. Please note the limit is <b><%= format_bytes(config->{max_upload_size}) %></b>.</p>
+<p>
+	Here you can upload files. Please note the limit is <b><%= format_bytes(config->{max_upload_size}) %></b>
+	on the web interface.
+</p>
 
 % if (my $msg = flash 'msg') {
 <p>
