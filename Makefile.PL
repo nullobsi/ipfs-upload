@@ -9,6 +9,7 @@ WriteMakefile(
       'Mojolicious'                  => '9.27',
       'Mojolicious::Plugin::OpenAPI' => '5.07',
       'Mojo::Pg'                     => '4.27',
+      'Mojo::SQLite'                 => '3.009',
       'Crypt::Random'                => '1.25',
       'Number::Bytes::Human'         => '0.11',
   },

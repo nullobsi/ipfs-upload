@@ -59,8 +59,9 @@ sub list_tokens($self, $uid) {
 
 sub getOrMake($self, $username) {
 	return $self->sql->db->select_p('users', ['uid'], {username => $username})->then(sub ($res) {
-		if ($res->rows != 0) {
-			return $res->hash->{uid};
+		my $val = $res->hash;
+		if (defined $val) {
+			return $val->{uid};
 		}
 		return $self->sql->db->insert_p('users', {username => $username}, {returning => 'uid'})->then(sub ($n) {
 			return $n->hash->{uid};

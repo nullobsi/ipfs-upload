@@ -40,7 +40,7 @@ sub cid_count($self, $cid) {
 }
 
 sub count($self, $where) {
-	return $self->sql->db->select_p('pins', 'count(*)', $where)->then(sub ($res) {
+	return $self->sql->db->select_p('pins', 'count(*) as count', $where)->then(sub ($res) {
 		return $res->hash->{count};
 	});
 }

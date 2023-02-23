@@ -5,6 +5,7 @@ use experimental q/signatures/;
 
 use Mojo::Base 'Mojolicious', -signatures;
 use Mojo::Pg;
+use Mojo::SQLite;
 use IpfsUpload::Model::Users;
 use IpfsUpload::Model::Pins;
 use IpfsUpload::Util;
@@ -30,12 +31,19 @@ sub startup($self) {
 		},
 	);
 
-	if ($config->{database}->{type} ne "postgres") {
-		die "Only postgres is supported";
+	my @dbs = qw/postgres sqlite/;
+	my $dbtype = $config->{database}->{type};
+	if (not grep $_ eq $dbtype, @dbs) {
+		die "Database type is not supported";
 	}
 
+
 	$self->helper(sql => sub ($app) {
-		state $sql = Mojo::Pg->new($config->{'database'}->{connection});
+		if ($dbtype eq "postgres") {
+			state $sql = Mojo::Pg->new($config->{database}->{connection});
+		} elsif ($dbtype eq "sqlite") {
+			state $sql = Mojo::SQLite->new($config->{database}->{connection});
+		}
 	});
 
 	$self->helper(pins => sub ($app) {
