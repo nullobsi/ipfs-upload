@@ -45,3 +45,15 @@
 <p>
 	<a href="https://docs.ipfs.tech/how-to/work-with-pinning-services/">More info on pinning</a>
 </p>
+
+% if ($c->config->{auth} eq 'db') {
+	<p>Change your password here:</p>
+%= form_for '/my/password' => (method => 'POST') => begin
+	<p>
+		%= label_for password => 'New Password'
+		%= password_field 'password', id=>'password'
+	</p>
+    %= submit_button
+% end
+
+% }

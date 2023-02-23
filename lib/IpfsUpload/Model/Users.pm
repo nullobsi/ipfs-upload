@@ -57,7 +57,7 @@ sub list_tokens($self, $uid) {
 	});
 }
 
-sub getOrMake($self, $username) {
+sub get_or_make($self, $username) {
 	return $self->sql->db->select_p('users', ['uid'], {username => $username})->then(sub ($res) {
 		my $val = $res->hash;
 		if (defined $val) {
@@ -85,4 +85,13 @@ sub get_pass_hash($self, $uid) {
 	});
 }
 
+sub make_with_pass($self, $username, $hash) {
+	return $self->sql->db->insert_p('users', {username => $username, pass => $hash}, {returning => 'uid'})->then(sub ($n) {
+		return $n->hash->{uid};
+	});
+}
+
+sub set_pass_hash($self, $uid, $hash) {
+	return $self->sql->db->update_p('users', { pass => $hash }, { uid => $uid });
+}
 1;

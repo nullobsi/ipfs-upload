@@ -70,6 +70,7 @@ sub startup($self) {
 	$r->get('/login')->to('Login#login');
 	$r->get('/my/logout')->to('Login#logout');
 	$r->post('/auth')->to('Login#auth');
+	$r->post('/my/password')->to('Login#change_password');
 	$r->get('/my')->to('Interface#landing');
 	$r->get('/my/tokens')->to('Interface#token_list');
 

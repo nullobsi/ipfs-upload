@@ -11,7 +11,7 @@ use Bytes::Random::Secure qw/random_bytes_hex/;
 
 sub add_pass($pass) {
 	my $salt = random_bytes_hex(16);
-	my $encoded = argon2id_pass($pass, $salt, '32M', 1, 16);
+	my $encoded = argon2id_pass($pass, $salt, 3, '32M', 1, 16);
 	return $encoded;
 }
 
