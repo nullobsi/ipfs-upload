@@ -6,6 +6,18 @@ use experimental qw/signatures/;
 use Mojo::JSON qw/decode_json encode_json/;
 use Time::Piece;
 
+use Crypt::Argon2 qw/argon2id_pass argon2id_verify/;
+use Bytes::Random::Secure qw/random_bytes_hex/;
+
+sub add_pass($pass) {
+	my $salt = random_bytes_hex(16);
+	my $encoded = argon2id_pass($pass, $salt, '32M', 1, 16);
+	return $encoded;
+}
+
+sub check_pass($pass, $hash) {
+	return argon2id_verify($hash, $pass);
+}
 
 sub date_format($date) {
 	$date =~ s/ /T/;

@@ -37,6 +37,11 @@ sub startup($self) {
 		die "Database type is not supported";
 	}
 
+	my @auths = qw/ldap db/;
+	my $auth = $config->{auth};
+	if (not grep $_ eq $auth, @auths) {
+		die "Auth type is not supported";
+	}
 
 	$self->helper(sql => sub ($app) {
 		if ($dbtype eq "postgres") {

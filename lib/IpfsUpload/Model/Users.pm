@@ -69,4 +69,20 @@ sub getOrMake($self, $username) {
 	});
 }
 
+sub get($self, $username) {
+	return $self->sql->db->select_p('users', ['uid'], {username => $username})->then(sub ($res) {
+		my $val = $res->hash;
+		if (defined $val) {
+			return $val->{uid};
+		}
+		return undef;
+	});
+}
+
+sub get_pass_hash($self, $uid) {
+	return $self->sql->db->select_p('users', ['pass'], {uid => $uid})->then(sub ($res) {
+		return $res->hash->{pass};
+	});
+}
+
 1;

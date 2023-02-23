@@ -21,24 +21,44 @@ sub auth($c) {
 
 	my $config = $c->config;
 
-	my $connStr = $config->{'ldap'}->{'uri'};
-	my $bindDN = $config->{'ldap'}->{'dnBase'};
-	$bindDN =~ s/%u/$username/;
+	if ($config->{auth} eq 'ldap') {
+		my $connStr = $config->{'ldap'}->{'uri'};
+		my $bindDN = $config->{'ldap'}->{'dnBase'};
+		$bindDN =~ s/%u/$username/;
 
-	return Mojo::IOLoop->subprocess->run_p(sub {
-		my $ldap=  Net::LDAPS->new($connStr, verify=>'none', version=>3) or die "$@";
-		my $mesg = $ldap->bind($bindDN, password=>$password);
-		$mesg->code and die $mesg->error;
-	})->then(sub ($res) {
-		return $c->users->getOrMake($username);
-	})->then(sub ($res) {
-		$c->session->{uid} = $res;
-		$c->flash(msg => "Logged in.");
-		$c->redirect_to('/my');
-	})->catch(sub ($err) {
-		$c->flash(msg => "Login failed.");
-		$c->redirect_to('/login');
-	});
+		return Mojo::IOLoop->subprocess->run_p(sub {
+			my $ldap=  Net::LDAPS->new($connStr, verify=>'none', version=>3) or die "$@";
+			my $mesg = $ldap->bind($bindDN, password=>$password);
+			$mesg->code and die $mesg->error;
+		})->then(sub ($res) {
+			return $c->users->getOrMake($username);
+		})->then(sub ($res) {
+			$c->session->{uid} = $res;
+			$c->flash(msg => "Logged in.");
+			$c->redirect_to('/my');
+		})->catch(sub ($err) {
+			$c->flash(msg => "Login failed.");
+			$c->redirect_to('/login');
+		});
+	} elsif ($config->{auth} eq 'db') {
+		return $c->users->get($username)->then(sub ($uid) {
+			if (!defined $uid) {
+				$c->flash(msg => "Login failed.");
+				return $c->redirect_to('/login');
+			}
+			return $c->users->get_pass_hash($uid)->then(sub ($hash) {
+				if (IpfsUpload::Util::check_pass($password, $hash)) {
+					$c->session->{uid} = $uid;
+					$c->flash(msg => "Logged in.");
+					return $c->redirect_to('/my');
+				}
+				die "Login failed.";
+			});
+		})->catch(sub ($err) {
+			$c->flash(msg => "Login failed.");
+			$c->redirect_to('/login');
+		});
+	}
 }
 
 sub login($c) {
