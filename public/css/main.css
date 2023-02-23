@@ -102,6 +102,31 @@ label.field-with-error {
     color: red;
 }
 
+/* Tables */
+table {
+    border-collapse: collapse;
+}
+th, td {
+    padding: 5px;
+}
+th {
+    border-bottom: solid 2px currentColor;
+}
+
+td:first-child {
+    border-right: solid 2px currentColor;
+    border-left: none;
+}
+td {
+    border-right: solid 2px currentColor;
+    border-left: solid 2px currentColor;
+}
+td:last-child {
+    border-right: none;
+    border-left: solid 2px currentColor;
+}
+
+
 /* Light mode */
 @media (prefers-color-scheme: light) {
     body {

@@ -19,18 +19,32 @@
 	<%= $count %> pins found.
 </p>
 
-<ul>
-% for my $pin (@$pins) {
-	<li>
-		<a href="<%= $pin->{publicUrl} %>"><%= $pin->{name} || $pin->{cid} %></a>:
-		<a href="/my/pins/<%= $pin->{id} %>/delete">Delete</a>
-		<small>Created by: <%= $pin->{app_name} %></small>
-	</li>
-% }
-</ul>
 % if (scalar @$pins == 0) {
 	<p>Seems like there's nothing here.</p>
-% } elsif (scalar @$pins == $limit) {
+% } else {
+	<table>
+		<tr>
+			<th>Filename</th>
+			<th>Created By</th>
+			<th>Actions</th>
+		</tr>
+% for my $pin (@$pins) {
+		<tr>
+			<td>
+				<a href="<%= $pin->{publicUrl} %>"><%= $pin->{name} || $pin->{cid} %></a>
+			</td>
+			<td>
+				<%= $pin->{app_name} %>
+			</td>
+			<td>
+				<a href="/my/pins/<%= $pin->{id} %>/delete">Delete</a>
+			</td>
+		</tr>
+% }
+	</table>
+% }
+
+% if (scalar @$pins == $limit) {
 	<a href="<%= url_with->query({before => $nextPage}) %>">Next page</a>
 % }
 
