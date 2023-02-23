@@ -6,14 +6,14 @@ use Crypt::Random qw( makerandom_octet );
 
 use Mojo::Base -base, -signatures;
 
-has 'pg';
+has 'sql';
 
 sub token_info($self, $token) {
-	return $self->pg->db->select('access_token', ['uid', 'app_name'], { token => $token })->hash;
+	return $self->sql->db->select('access_token', ['uid', 'app_name'], { token => $token })->hash;
 }
 
 sub token_info_p($self, $token) {
-	return $self->pg->db->select_p('access_token', ['uid', 'app_name', 'id'], {
+	return $self->sql->db->select_p('access_token', ['uid', 'app_name', 'id'], {
 		token => $token,
 	})->then(sub ($res) {
 		return $res->hash;
@@ -26,7 +26,7 @@ sub gen_token($self, $uid, $app_name) {
 	my $s = unpack "H*",     pack "B*", '0' x ( $size%8 ? 8-$size % 8 : 0 ).
 		unpack "b$size", $r;
 
-	return $self->pg->db->insert_p(
+	return $self->sql->db->insert_p(
 		'access_token',
 		{
 			uid      => $uid,
@@ -40,7 +40,7 @@ sub gen_token($self, $uid, $app_name) {
 }
 
 sub del_token($self, $uid, $id) {
-	return $self->pg->db->delete_p(
+	return $self->sql->db->delete_p(
 		'access_token',
 		{
 			uid => $uid,
@@ -50,7 +50,7 @@ sub del_token($self, $uid, $id) {
 }
 
 sub list_tokens($self, $uid) {
-	return $self->pg->db->select_p('access_token', ['uid', 'app_name', 'id'], {
+	return $self->sql->db->select_p('access_token', ['uid', 'app_name', 'id'], {
 		uid => $uid,
 	})->then(sub ($res) {
 		return $res->hashes;
@@ -58,11 +58,11 @@ sub list_tokens($self, $uid) {
 }
 
 sub getOrMake($self, $username) {
-	return $self->pg->db->select_p('users', ['uid'], {username => $username})->then(sub ($res) {
+	return $self->sql->db->select_p('users', ['uid'], {username => $username})->then(sub ($res) {
 		if ($res->rows != 0) {
 			return $res->hash->{uid};
 		}
-		return $self->pg->db->insert_p('users', {username => $username}, {returning => 'uid'})->then(sub ($n) {
+		return $self->sql->db->insert_p('users', {username => $username}, {returning => 'uid'})->then(sub ($n) {
 			return $n->hash->{uid};
 		});
 	});

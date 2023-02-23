@@ -34,16 +34,16 @@ sub startup($self) {
 		die "Only postgres is supported";
 	}
 
-	$self->helper(pg => sub ($app) {
-		state $pg = Mojo::Pg->new($config->{'database'}->{connection});
+	$self->helper(sql => sub ($app) {
+		state $sql = Mojo::Pg->new($config->{'database'}->{connection});
 	});
 
 	$self->helper(pins => sub ($app) {
-		state $pins = IpfsUpload::Model::Pins->new(pg => $app->pg);
+		state $pins = IpfsUpload::Model::Pins->new(sql => $app->sql);
 	});
 
 	$self->helper(users => sub ($app) {
-		state $users = IpfsUpload::Model::Users->new(pg => $app->pg);
+		state $users = IpfsUpload::Model::Users->new(sql => $app->sql);
 	});
 
 	# Configure the application
