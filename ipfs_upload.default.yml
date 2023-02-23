@@ -5,13 +5,25 @@ secrets:
 max_upload_size: 104857600
 
 database:
-  type: 'postgres'
-  connection: 'postgresql://'
+  # SQLite
+  #type: 'sqlite'
+  #connection: 'sqlite:app.db'
+
+  # Postgres
+  #type: 'postgres'
+  #connection: 'postgresql://'
+
+
+# Use DB auth
+#auth: 'db'
+#whitelist_names:
+  - nullobsi
 
 # Use ldap auth
-ldap:
-  uri: 'ldaps://127.0.0.1'
-  dnBase: 'CN=%u,OU=Users,DC=example,DC=org'
+#auth: 'ldap'
+#ldap:
+#  uri: 'ldaps://127.0.0.1'
+#  dnBase: 'CN=%u,OU=Users,DC=example,DC=org'
 
 ipfs:
   # Please add leading slash for both
