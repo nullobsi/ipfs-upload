@@ -22,6 +22,7 @@
 % if (scalar @$pins == 0) {
 	<p>Seems like there's nothing here.</p>
 % } else {
+	<div class="responsive-wrapper">
 	<table>
 		<tr>
 			<th>Filename</th>
@@ -42,6 +43,7 @@
 		</tr>
 % }
 	</table>
+	</div>
 % }
 
 % if (scalar @$pins == $limit) {

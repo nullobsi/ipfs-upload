@@ -105,6 +105,7 @@ label.field-with-error {
 /* Tables */
 table {
     border-collapse: collapse;
+    width: 100%;
 }
 th, td {
     padding: 5px;
@@ -126,6 +127,11 @@ td:last-child {
     border-left: solid 2px currentColor;
 }
 
+/* Responsive */
+.responsive-wrapper {
+    overflow-x: auto;
+    width: 100%;
+}
 
 /* Light mode */
 @media (prefers-color-scheme: light) {
