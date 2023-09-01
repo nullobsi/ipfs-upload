@@ -8,6 +8,15 @@ use IpfsUpload::Util;
 use Mojo::UserAgent;
 use Mojo::JSON qw(decode_json encode_json);
 
+# Form CID object, seperate so we can leave {name}
+# out of it
+sub pin_obj($name, $cid) {
+	my %cidobj = ();
+	$cidobj{cid} = $cid;
+	$cidobj{name} = $name if defined $name;
+	return \%cidobj;
+}
+
 sub list($c) {
 	$c->openapi->valid_input or return;
 
@@ -34,10 +43,7 @@ sub list($c) {
 					# TODO
 					status    => "pinned",
 					created   => IpfsUpload::Util::date_format($v->{created_at}),
-					pin       => {
-						cid  => $v->{cid},
-						name => $v->{name},
-					},
+					pin       => pin_obj($v->{name}, $v->{cid}),
 					delegates => $c->config->{ipfs}->{delegates},
 					meta      => { app_name => $v->{app_name}},
 				};
@@ -75,10 +81,7 @@ sub get($c) {
 			# TODO
 			status    => "pinned",
 			created   => IpfsUpload::Util::date_format($pin->{created_at}),
-			pin       => {
-				cid  => $pin->{cid},
-				name => $pin->{name} || $pin->{cid},
-			},
+			pin       => pin_obj($pin->{name}, $pin->{cid}),
 			delegates => $c->config->{ipfs}->{delegates},
 			meta      => { app_name => $pin->{app_name}},
 		});
@@ -222,10 +225,7 @@ sub replace($c) {
 				# TODO
 				status    => "pinned",
 				created   => IpfsUpload::Util::date_format($pin->{created_at}),
-				pin       => {
-					cid  => $cid,
-					name => $name || $cid,
-				},
+				pin       => pin_obj($name, $cid),
 				delegates => $c->config->{ipfs}->{delegates},
 				meta      => { app_name => $app_name},
 			}, status => 202);
@@ -384,10 +384,7 @@ sub add($c) {
 				# TODO
 				status    => "pinned",
 				created   => IpfsUpload::Util::date_format($res->{created_at}),
-				pin       => {
-					cid  => $cid,
-					name => $name || $cid,
-				},
+				pin       => pin_obj($name, $cid),
 				delegates => $c->config->{ipfs}->{delegates},
 				meta      => { app_name => $app_name},
 			}, status => 202)
