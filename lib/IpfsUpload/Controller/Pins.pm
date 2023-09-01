@@ -70,16 +70,15 @@ sub get($c) {
 			})
 		}
 
-		my %pinobj;
-		$pinobj{cid} = $pin->{cid};
-		$pinobj{name} = $pin->{name} if defined $pin->{name} and $pin->{name} ne "";
-
 		return $c->render(status => 200, openapi => {
 			requestid => $pin->{id},
 			# TODO
 			status    => "pinned",
 			created   => IpfsUpload::Util::date_format($pin->{created_at}),
-			pin       => \%pinobj,
+			pin       => {
+				cid  => $pin->{cid},
+				name => $pin->{name},
+			},
 			delegates => $c->config->{ipfs}->{delegates},
 			meta      => { app_name => $pin->{app_name}},
 		});
