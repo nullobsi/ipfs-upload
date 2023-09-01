@@ -77,7 +77,7 @@ sub get($c) {
 			created   => IpfsUpload::Util::date_format($pin->{created_at}),
 			pin       => {
 				cid  => $pin->{cid},
-				name => $pin->{name},
+				name => $pin->{name} || $pin->{cid},
 			},
 			delegates => $c->config->{ipfs}->{delegates},
 			meta      => { app_name => $pin->{app_name}},
@@ -224,7 +224,7 @@ sub replace($c) {
 				created   => IpfsUpload::Util::date_format($pin->{created_at}),
 				pin       => {
 					cid  => $cid,
-					name => $name,
+					name => $name || $cid,
 				},
 				delegates => $c->config->{ipfs}->{delegates},
 				meta      => { app_name => $app_name},
@@ -386,7 +386,7 @@ sub add($c) {
 				created   => IpfsUpload::Util::date_format($res->{created_at}),
 				pin       => {
 					cid  => $cid,
-					name => $name,
+					name => $name || $cid,
 				},
 				delegates => $c->config->{ipfs}->{delegates},
 				meta      => { app_name => $app_name},
