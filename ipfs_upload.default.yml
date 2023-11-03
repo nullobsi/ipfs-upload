@@ -4,6 +4,8 @@ secrets:
 
 max_upload_size: 104857600
 
+service_name: "pinserv"
+
 database:
   # SQLite
   #type: 'sqlite'

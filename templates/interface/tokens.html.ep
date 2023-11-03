@@ -43,7 +43,10 @@
 	your IPFS node at the endpoint <b><%= url_for('/api')->to_abs->scheme("https") %></b>
 	and give it the generated access token.
 	<br>
+	You can do this using Kubo's web interface, or by running the
+	command:
 </p>
+<pre>ipfs pin remote service add <%= $c->config->service_name %> <%= url_for('/api')->to_abs->scheme("https") %> &lt;SECRET KEY&gt;</pre>
 <p>
 	<a href="https://docs.ipfs.tech/how-to/work-with-pinning-services/">More info on pinning</a>
 </p>
