@@ -46,7 +46,7 @@
 	You can do this using Kubo's web interface, or by running the
 	command:
 </p>
-<pre>ipfs pin remote service add <%= $c->config->service_name %> <%= url_for('/api')->to_abs->scheme("https") %> &lt;SECRET KEY&gt;</pre>
+<pre>ipfs pin remote service add <%= $c->config->{service_name} %> <%= url_for('/api')->to_abs->scheme("https") %> &lt;SECRET KEY&gt;</pre>
 <p>
 	<a href="https://docs.ipfs.tech/how-to/work-with-pinning-services/">More info on pinning</a>
 </p>
